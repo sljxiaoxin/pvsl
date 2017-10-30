@@ -23,7 +23,7 @@ getDirection();
 var PlatformerGame = PlatformerGame || {};
 
 PlatformerGame.game = new Phaser.Game(Global.width, Global.height, Phaser.AUTO, '', null, false, false);
-
+/*
 Phaser.World.prototype.displayObjectUpdateTransform = function () {
     if (Global.direction == '1') {
         PlatformerGame.game.scale.setGameSize(Global.height, Global.width)
@@ -38,6 +38,7 @@ Phaser.World.prototype.displayObjectUpdateTransform = function () {
     }
     PIXI.DisplayObject.prototype.updateTransform.call(this);
 }
+*/
 //, '', { preload: preload, create: cr4ate, update: update });
 
 PlatformerGame.game.state.add('Boot', PlatformerGame.Boot);

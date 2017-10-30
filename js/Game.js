@@ -4,26 +4,55 @@ var PlatfomerGame = PlatformerGame || {};
 PlatformerGame.Game = function(){};
 
 PlatformerGame.Game.prototype = {
+    jMap : {
+        's3' : {idx:0,frame:'cardSpades3'},'h3' : {idx:1,frame:'cardHearts3'},'c3' : {idx:2,frame:'cardClubs3'},'d3' : {idx:3,frame:'cardDiamonds3'},
+        's4' : {idx:4,frame:'cardSpades4'},'h4' : {idx:5,frame:'cardHearts4'},'c4' : {idx:6,frame:'cardClubs4'},'d4' : {idx:7,frame:'cardDiamonds4'},
+        's5' : {idx:8,frame:'cardSpades5'},'h5' : {idx:9,frame:'cardHearts5'},'c5' : {idx:10,frame:'cardClubs5'},'d5' : {idx:11,frame:'cardDiamonds5'},
+        's6' : {idx:12,frame:'cardSpades6'},'h6' : {idx:13,frame:'cardHearts6'},'c6' : {idx:14,frame:'cardClubs6'},'d6' : {idx:15,frame:'cardDiamonds6'},
+        's7' : {idx:16,frame:'cardSpades7'},'h7' : {idx:17,frame:'cardHearts7'},'c7' : {idx:18,frame:'cardClubs7'},'d7' : {idx:19,frame:'cardDiamonds7'},
+        's8' : {idx:20,frame:'cardSpades8'},'h8' : {idx:21,frame:'cardHearts8'},'c8' : {idx:22,frame:'cardClubs8'},'d8' : {idx:23,frame:'cardDiamonds8'},
+        's9' : {idx:24,frame:'cardSpades9'},'h9' : {idx:25,frame:'cardHearts9'},'c9' : {idx:26,frame:'cardClubs9'},'d9' : {idx:27,frame:'cardDiamonds9'},
+        's10' : {idx:28,frame:'cardSpades10'},'h10' : {idx:29,frame:'cardHearts10'},'c10' : {idx:30,frame:'cardClubs10'},'d10' : {idx:31,frame:'cardDiamonds10'},
+        'sJ' : {idx:32,frame:'cardSpadesJ'},'hJ' : {idx:33,frame:'cardHeartsJ'},'cJ' : {idx:34,frame:'cardClubsJ'},'dJ' : {idx:35,frame:'cardDiamondsJ'},
+        'sQ' : {idx:36,frame:'cardSpadesQ'},'hQ' : {idx:37,frame:'cardHeartsQ'},'cQ' : {idx:38,frame:'cardClubsQ'},'dQ' : {idx:39,frame:'cardDiamondsQ'},
+        'sK' : {idx:40,frame:'cardSpadesK'},'hK' : {idx:41,frame:'cardHeartsK'},'cK' : {idx:42,frame:'cardClubsK'},'dK' : {idx:43,frame:'cardDiamondsK'},
+        'sA' : {idx:44,frame:'cardSpadesA'},'hA' : {idx:45,frame:'cardHeartsA'},'cA' : {idx:46,frame:'cardClubsA'},'dA' : {idx:47,frame:'cardDiamondsA'},
+        's2' : {idx:48,frame:'cardSpades2'},'h2' : {idx:49,frame:'cardHearts2'},'c2' : {idx:50,frame:'cardClubs2'},'d2' : {idx:51,frame:'cardDiamonds2'},
+        'sjb' : {idx:52,frame:'cardJokerBlack'},'sjr' : {idx:53,frame:'cardJokerRed'},
+    },
+    arrMap : [
+
+    ],
+    wsFactory : function(msgJson){
+        if(msgJson['act'] == 'dealCards'){
+            //发牌
+            this.dealCards(msgJson);
+        }
+    },
+    dealCards : function(msgJson){
+        var gap = 35, posX = 120;
+        for(var i=0;i<msgJson['cards'].length;i++){
+          var frame = msgJson['cards'][i];
+          var frameName = this.jMap[frame]['frame'];
+          var cardSprite = this.game.add.tileSprite(posX, Global.height-190, 140, 190, 'sprites', frameName+'.png');
+          cardSprite.tileKey = frame;
+          cardSprite.inputEnabled = true;
+          cardSprite.events.onInputDown.add(function(sp){
+              console.log("you clicked ",sp.tileKey);
+          }, this);
+          posX += gap;
+        }
+    },
     create: function() {
 
         //  A simple background for our game
         this.game.add.sprite(0, 0, 'background');
-        ///*
-        sprite1 = this.game.add.tileSprite(0, Global.height-190, 140, 190, 'sprites', 'cardJokerRed.png');
-        sprite1.inputEnabled = true;
-        //sprite1.scale.setTo(0.5);
-        //sprite1.liteKey = "cardJokerRed";
-        sprite2 = this.game.add.tileSprite(35, Global.height-190, 140, 190, 'sprites', 'cardClubs2.png');
-        sprite3 = this.game.add.tileSprite(70, Global.height-190, 140, 190, 'sprites', 'cardClubs3.png');
-        sprite4 = this.game.add.tileSprite(105, Global.height-190, 140, 190, 'sprites', 'cardClubs4.png');
-        sprite5 = this.game.add.tileSprite(140, Global.height-190, 140, 190, 'sprites', 'cardClubs5.png');
-        var xx = 140;
-        for(var i=0;i<12;i++){
-            xx += 35;
-            this.game.add.tileSprite(xx, Global.height-190, 140, 190, 'sprites', 'cardHearts7.png');
-        }
+        //发牌
+        this.wsFactory({act : 'dealCards', cards:['sjr','sjb','d2','h2','sA','cQ','hQ','h10','c9','d8','s6','h5','s5','c4','h4','d3','h3']});
 
 
+
+        //*/
         var data = [{key:'h3',index:'3'},{key:'h1',index:'1'},{key:'h2',index:'2'}];
         console.log(data);
         var compair = function(propertyName){
@@ -46,11 +75,13 @@ PlatformerGame.Game.prototype = {
 
     update : function(){
         //console.log("sprite1.liteKey:",sprite1.liteKey);
+        /*
         if (sprite1.input.pointerOver()) {
-            console.log("鼠标放在了大毛上");
+            //console.log("鼠标放在了大毛上");
         }else{
             //console.log("鼠标移出大毛");
         }
+        */
     },
 
     render: function() {
