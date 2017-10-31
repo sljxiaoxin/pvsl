@@ -6,35 +6,38 @@
 				public function __construct() {
 						parent::__construct();
 				}
-
-				public function sendErrorCmd($id){
-						if(isset($this->arrConn[$id]['connection'])){
-								$this->arrConn[$id]['connection']->send(json_encode(array('success'=>"0", "act"=>"errorcmd",'msg'=>'')));
-						}
-				}
-
-				public function dealClientMsg($myId, $data){
+				
+				public function dealClientMsg($id, $data){
 						$arrData = json_decode($data, true);
 						if($arrData == null || !isset($arrData['act'])){
-					      $this->sendErrorCmd($myId);
+					      $this->sendErrorCmd($id);
 							  return;
 						}
 						switch($arrData['act']){
 								case 'login':
-									$this->login($myId, $arrData);
+									$this->login($id, $arrData);
 									break;
 								case 'heartcheck':
+									$this->arrConn[$id]['connection']->send(json_encode(array("act"=>"heartcheck")));
 									break;
 								default:
+									$this->sendErrorCmd($id);
 									break;
 						}
 				}
 
-				public function login($myId, $arrData){
-						$objPvsl->setConn($myId, array(
-								  'home'    => $arrData['home']
+				public function login($id, $arrData){
+						$this->setConn($id, array(
+								  'home' => $arrData['home']
 							)
 						);
+						$this->addHome($arrData['home'], $id);
+				}
+
+				public function sendErrorCmd($id){
+						if(isset($this->arrConn[$id]['connection'])){
+								$this->arrConn[$id]['connection']->send(json_encode(array("act"=>"error",'msg'=>'nocmdhandler or not json')));
+						}
 				}
 		}
 ?>

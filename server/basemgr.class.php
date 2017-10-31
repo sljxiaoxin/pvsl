@@ -42,8 +42,8 @@ class wsBaseMgr {
 							$connCli = $this->arrConn[$key]['client'];
 							$connCli->close();
 					}
-
 				}
+				print_r($this->arrHome);
 		}
 
 		/*
@@ -73,7 +73,10 @@ class wsBaseMgr {
 						$this->arrHome[$homeNo] = array();
 				}
 				if($id != ''){
-						$this->arrHome[$homeNo][] = $id;
+						if(!in_array($id, $this->arrHome[$homeNo])){
+								$this->arrHome[$homeNo][] = $id;
+						}
+
 				}
 		}
 
