@@ -2,7 +2,8 @@
 use Workerman\Worker;
 use Workerman\Lib\Timer;
 use \Workerman\Connection\AsyncTcpConnection;
-require_once __DIR__ . '/workerman/Autoloader.php';
+//require_once __DIR__ . '/workerman/Autoloader.php';
+require_once __DIR__ . '/workerman-for-win/Autoloader.php';
 /*
 	//使用方式：
 	启动
@@ -20,11 +21,19 @@ define("TIMEOUT_MINUTES", 12);
 define("DEBUG", true);
 define("LOG_FILENAME", "/tmp/workerman_ws.log");
 
+require_once __DIR__ . '/pvsl.class.php';
+
+$objPvsl = new wsPvsl();
+//$objPvsl->addConn('1_1', array('home'=>'17888'));
+//var_dump($objPvsl);
+
+
+
 /*
 	结构：
 	arrAllConn = array(
 		'id_1' => array(
-      'homeNo'           => '房间号1',
+      'home'           => '房间号1',
 			'client'           => '客户端和ws服务端的链接句柄',
 			'cli_last_time'    => 'ws最后一次和客户端通讯时间戳'
 		),
@@ -44,7 +53,7 @@ $arrAllConn = array();
         )
     );
 */
-$arrHome = array();
+$arrAllHome = array();
 
 
 // 创建一个Worker监听2346端口，使用websocket协议通讯
@@ -58,59 +67,55 @@ $ws_worker->onWorkerStart = function($ws_worker)
     if($ws_worker->id === 0)
     {
         Timer::add(60, function(){
-			global $arrAllConn;
-			Logdog("---------------------[当前在线人数：".count($arrAllConn)."]-------------------->");
-			foreach($arrAllConn as $key => $val){
-				Logdog("当前id：".$key);
-				$now = time();
-				$server_last_time = $arrAllConn[$key]['server_last_time'];
-				$cli_last_time = $arrAllConn[$key]['cli_last_time'];
-				$server_now_diff = $now - $server_last_time;
-				$cli_now_diff = $now - $cli_last_time;
-				Logdog("ws->server时间间隔：".$server_now_diff);
-				Logdog("ws->client时间间隔：".$cli_now_diff);
-				if($server_now_diff>TIMEOUT_MINUTES*60 || $cli_now_diff>TIMEOUT_MINUTES*60){
-					$connSer = $arrAllConn[$key]['server'];
-					$connCli = $arrAllConn[$key]['client'];
-					$connCli->close();
-					$connSer->close();
-				}
-
-			}
-            //print_r(array_keys($arrAllConn));
-		   //print_r($arrAllConn);
+      			global $objPvsl;
+      			$objPvsl->checkConn();
         });
     }
 };
 // 从客户端来消息
-$ws_worker->onMessage = function($connection, $data) use (&$arrAllConn)
+$ws_worker->onMessage = function($connection, $data) use (&$objPvsl, &$arrAllConn, &$arrAllHome)
 {
-
+  //var_dump($data);
 	$conn_id = $connection->id;
 	$worker_id = $connection->worker->id;
 	$myId = $conn_id."_".$worker_id;
 	Logdog("cli->ws id is:[".$myId."]");
-	Logdog("收到来自client消息：".$data);
+	Logdog("receive from client msg:".$data);
 
-	$arrData = json_decode($data, true);
+  $objPvsl->setConn($myId, array(
+      'connection'    => $connection,
+      'cli_last_time' => time()
+    )
+  );
 
-	if(isset($arrAllConn[$myId])){
-		$arrAllConn[$myId]['cli_last_time'] = time();
-	}
+  $objPvsl->dealClientMsg($myId, $data);
+
 	if($arrData == null || !isset($arrData['act'])){
-		$connection->send(json_encode(array('success'=>"0", "act"=>"errorcmd",'msg'=>'')));
-		return;
+		//$connection->send(json_encode(array('success'=>"0", "act"=>"errorcmd",'msg'=>'')));
+      $objPvsl->sendErrorCmd($myId);
+		  return;
 	}
 	switch($arrData['act']){
 		case 'login':
-
+      $objPvsl->login($myId, array(
+          'home'    => $arrData['home']
+        )
+      );
+      //$arrAllConn[$myId]['client'] = $connection;
+      //$arrAllConn[$myId]['home'] = $arrData['home'];
+      $connection->send(json_encode(array("act"=>"setId",'id'=>$myId)));   //发送给客户端
+      if(!isset($arrAllHome[$arrData['home']])){
+          $arrAllHome[$arrData['home']] = array($myId);
+      }else{
+          $arrAllHome[$arrData['home']][] = $myId;  //当前房间已进入id列表
+      }
 			break;
 		case 'heartcheck':
 			//心跳检测
-			$connection->send(json_encode(array('success'=>"1", "act"=>"heartcheck",'msg'=>'')));   //发送给客户端
+			$connection->send(json_encode(array("act"=>"heartcheck",'msg'=>'')));   //发送给客户端
 			break;
 		default:
-			$connection->send(json_encode(array('success'=>"0", "act"=>"errorcmd",'msg'=>'')));     //其他指令包括控制指令不受理
+			$connection->send(json_encode(array("act"=>"errorcmd",'msg'=>'')));     //其他指令包括控制指令不受理
 			break;
 	}
 
@@ -123,11 +128,6 @@ $fnCloseOrErr = function($connection) use (&$arrAllConn)
 	$worker_id = $connection->worker->id;
 	$myId = $conn_id."_".$worker_id;
 	Logdog("cli->ws close id is:[".$myId."]");
-	if(isset($arrAllConn[$myId])){
-		$connSer = $arrAllConn[$myId]['server'];
-		$connSer->close();
-		unset($arrAllConn[$myId]);
-	}
 };
 
 $ws_worker->onClose = $fnCloseOrErr;
@@ -141,10 +141,12 @@ function Logdog($str = ''){
 	if(DEBUG){
 		echo $strLog;
 	}
+  /*
 	$logfile = fopen(LOG_FILENAME,"a+");
 	if($logfile){
 		fwrite($logfile, $strLog);
 	}
 	fclose($logfile);
+  */
 }
 ?>

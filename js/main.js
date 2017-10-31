@@ -43,6 +43,6 @@ Phaser.World.prototype.displayObjectUpdateTransform = function () {
 
 PlatformerGame.game.state.add('Boot', PlatformerGame.Boot);
 PlatformerGame.game.state.add('Preload', PlatformerGame.Preload);
-PlatformerGame.game.state.add('Game', PlatformerGame.Game);
+//PlatformerGame.game.state.add('Game', PlatformerGame.Game);
 
 PlatformerGame.game.state.start('Boot');

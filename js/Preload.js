@@ -20,8 +20,17 @@ PlatformerGame.Preload.prototype = {
   create: function() {
     var colour = "000";
     var timeout = 2;
-    this.state.start('Game', true, false, colour, timeout);
-                                          // armour, boots, mask, springBoots
+    var self = this;
+    console.log("Preload create func");
+
+    ws.connect(function(status){
+        if(status == 'open'){
+            console.log("ws.connect callback");
+            PlatformerGame.game.state.add('Game', PlatformerGame.Game);
+            self.state.start('Game', true, false, colour, timeout);
+        }
+    });
+    // armour, boots, mask, springBoots
     //this.state.start('Ending', true, false, false, false, false, false);
   }
 };

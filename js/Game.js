@@ -1,7 +1,11 @@
 var PlatfomerGame = PlatformerGame || {};
 
 //title screen
-PlatformerGame.Game = function(){};
+PlatformerGame.Game = function(){
+    console.log('Game 构造函数');
+    ws.setStage('Game', this);
+    ws.login('17888');  //传home
+};
 
 PlatformerGame.Game.prototype = {
     jMap : {
@@ -23,11 +27,48 @@ PlatformerGame.Game.prototype = {
     arrMap : [
 
     ],
-    wsFactory : function(msgJson){
-        if(msgJson['act'] == 'dealCards'){
-            //发牌
-            this.dealCards(msgJson);
-        }
+    data : {
+        id : '',
+        lId : '',      //左id
+        rId : '',      //右id
+        myCards : [],  //本id，服务器下发所有牌['h2','h3'...]
+        myCardsStatus : {},  //本id下所有牌状态，各项{}内部需要记录精灵对象
+
+        lCards : [],       //左侧本轮出牌，里面{}记录精灵对象
+        lCardsStatus : {}, //左侧本轮出牌状态记录 ，各项{}内部需要记录精灵对象
+
+        rCards : [],       //右侧本轮出牌，里面{}记录精灵对象
+        rCardsStatus : {}, //右侧本轮出牌状态记录 ，各项{}内部需要记录精灵对象
+
+        myCardsNowCounts : 0,
+        lCardsNowCounts : 0,
+        rCardsNowCounts : 0
+
+    },
+    wsFactory : function(){
+        var self = this;
+        return {
+            receive : function(oMsg){
+                //console.log('Game.wsFactory.receive:',oMsg);
+                switch (oMsg['act']) {
+                  case 'dealCards':
+                    self.dealCards(oMsg);
+                    break;
+                  case 'setId':
+                    self.setId(oMsg);
+                    break;
+                }
+            },
+            send : function(action, oMsg){
+                var m = oMsg;
+                m.act = action;
+                ws.send(m);
+            }
+        };
+    },
+    setId : function(oMsg){
+        this.data.id = oMsg.id;
+        //console.log("Game.data:",this.data);
     },
     dealCards : function(msgJson){
         var gap = 35, posX = 120;
@@ -48,7 +89,7 @@ PlatformerGame.Game.prototype = {
         //  A simple background for our game
         this.game.add.sprite(0, 0, 'background');
         //发牌
-        this.wsFactory({act : 'dealCards', cards:['sjr','sjb','d2','h2','sA','cQ','hQ','h10','c9','d8','s6','h5','s5','c4','h4','d3','h3']});
+        this.wsFactory().receive({act : 'dealCards', cards:['sjr','sjb','d2','h2','sA','cQ','hQ','h10','c9','d8','s6','h5','s5','c4','h4','d3','h3']});
 
 
 
