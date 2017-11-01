@@ -12,8 +12,10 @@ PlatformerGame.Preload.prototype = {
     this.load.setPreloadSprite(this.preloadBar);
 
     this.game.load.atlasXML('sprites', 'assets/images/sprites.png', 'assets/images/sprites.xml');
-    this.game.load.atlasXML('cards', 'assets/images/cards.png', 'assets/images/cards.xml');
+    //this.game.load.atlasXML('cards', 'assets/images/cards.png', 'assets/images/cards.xml');
     this.game.load.image('background', 'assets/images/background.png');
+    this.game.load.image('landlords', 'assets/images/landlords.png');
+    this.game.load.image('farmer', 'assets/images/farmer.png');
 
 
   },

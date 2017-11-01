@@ -79,16 +79,24 @@ PlatformerGame.Game.prototype = {
     onLeftId : function(oMsg){
         this.data.lId = oMsg.id;
         this.data.info.left = oMsg.info;
+        var farmer = this.game.add.sprite(10, 100, 'farmer');
+        var text = this.game.add.text(10,100+108+10, this.data.info.left.name,  { font: "30px Arial", fill: '#ffffff' });
     },
     // 右侧用户id
     onRightId : function(oMsg){
         this.data.rId = oMsg.id;
         this.data.info.right = oMsg.info;
+        var farmer = this.game.add.sprite(960-10, 100, 'farmer');
+        farmer.scale.setTo(-1,1);
+        var text = this.game.add.text(960-108-10,100+108+10, this.data.info.right.name,  { font: "30px Arial", fill: '#ffffff' });
     },
     // 登录成功
     onLogged : function(oMsg){
         this.data.id = oMsg.id;
         this.data.info.me = oMsg.info;
+        var farmer = this.game.add.sprite(10, Global.height- 108 - 130, 'farmer');
+        var text = this.game.add.text(10,Global.height - 100, this.data.info.me.name,  { font: "30px Arial", fill: '#ffffff' });
+        //farmer.scale.setTo(-1,1);翻转
         //console.log("Game.data:",this.data);
     },
     // 发牌
