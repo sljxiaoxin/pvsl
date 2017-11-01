@@ -1,18 +1,6 @@
 <?php
 class wsBaseMgr {
 		/*
-				结构：
-				$arrHome = array(
-						'房间号1' => array(
-								'member' => array(id_1,id_2,id_3)
-						),
-						'房间号2' => array(
-								'member' => array(id_4,id_5,id_6)
-						)
-				);
-		*/
-		protected $arrHome = array();
-		/*
 			结构：
 			$arrConn = array(
 				'id_1' => array(
@@ -43,7 +31,7 @@ class wsBaseMgr {
 							$connCli->close();
 					}
 				}
-				print_r($this->arrHome);
+				//print_r($this->arrHome);
 		}
 
 		/*
@@ -66,17 +54,11 @@ class wsBaseMgr {
 		}
 
 		/*
-			开通新房间并将用户id添加到房间
+		通过id给指定客户端发送消息
 		*/
-		public function addHome($homeNo, $id = ''){
-				if(!isset($this->arrHome[$homeNo])){
-						$this->arrHome[$homeNo] = array();
-				}
-				if($id != ''){
-						if(!in_array($id, $this->arrHome[$homeNo])){
-								$this->arrHome[$homeNo][] = $id;
-						}
-
+		public function sendClientMsg($id, $oData){
+				if(isset($this->arrConn[$id]['connection'])){
+						$this->arrConn[$id]['connection']->send(json_encode($oData));
 				}
 		}
 

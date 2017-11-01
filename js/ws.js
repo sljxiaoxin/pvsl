@@ -45,7 +45,7 @@ var ws = {
             if(typeof oMsg.stage != 'undefined'){
                 stage = oMsg.stage;
             }
-            this.stageInstance[stage].wsFactory().receive(oMsg);
+            this.stageInstance[stage].wsFactoryGenerator.receive(oMsg);
         }
 
     },

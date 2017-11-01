@@ -26,7 +26,7 @@ PlatformerGame.Preload.prototype = {
     ws.connect(function(status){
         if(status == 'open'){
             console.log("ws.connect callback");
-            PlatformerGame.game.state.add('Game', PlatformerGame.Game);
+            //PlatformerGame.game.state.add('Game', PlatformerGame.Game);
             self.state.start('Game', true, false, colour, timeout);
         }
     });

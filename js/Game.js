@@ -2,9 +2,7 @@ var PlatfomerGame = PlatformerGame || {};
 
 //title screen
 PlatformerGame.Game = function(){
-    console.log('Game 构造函数');
-    ws.setStage('Game', this);
-    ws.login('17888');  //传home
+    this.wsFactoryGenerator = this.wsFactory();
 };
 
 PlatformerGame.Game.prototype = {
@@ -31,6 +29,11 @@ PlatformerGame.Game.prototype = {
         id : '',
         lId : '',      //左id
         rId : '',      //右id
+        info : {
+            me    :{name : '', sex : 0, level : 0},
+            left  :{name : '', sex : 0, level : 0},
+            right :{name : '', sex : 0, level : 0}
+        },
         myCards : [],  //本id，服务器下发所有牌['h2','h3'...]
         myCardsStatus : {},  //本id下所有牌状态，各项{}内部需要记录精灵对象
 
@@ -49,13 +52,19 @@ PlatformerGame.Game.prototype = {
         var self = this;
         return {
             receive : function(oMsg){
-                //console.log('Game.wsFactory.receive:',oMsg);
+                console.log('Game.wsFactory.receive:',oMsg);
                 switch (oMsg['act']) {
-                  case 'dealCards':
-                    self.dealCards(oMsg);
+                  case 'fp':
+                    self.onFp(oMsg);
                     break;
-                  case 'setId':
-                    self.setId(oMsg);
+                  case 'loginok':
+                    self.onLogged(oMsg);
+                    break;
+                  case 'leftId':
+                    self.onLeftId(oMsg);
+                    break;
+                  case 'rightId':
+                    self.onRightId(oMsg);
                     break;
                 }
             },
@@ -66,11 +75,24 @@ PlatformerGame.Game.prototype = {
             }
         };
     },
-    setId : function(oMsg){
+    // 左侧用户id
+    onLeftId : function(oMsg){
+        this.data.lId = oMsg.id;
+        this.data.info.left = oMsg.info;
+    },
+    // 右侧用户id
+    onRightId : function(oMsg){
+        this.data.rId = oMsg.id;
+        this.data.info.right = oMsg.info;
+    },
+    // 登录成功
+    onLogged : function(oMsg){
         this.data.id = oMsg.id;
+        this.data.info.me = oMsg.info;
         //console.log("Game.data:",this.data);
     },
-    dealCards : function(msgJson){
+    // 发牌
+    onFp : function(msgJson){
         var gap = 35, posX = 120;
         for(var i=0;i<msgJson['cards'].length;i++){
           var frame = msgJson['cards'][i];
@@ -86,14 +108,16 @@ PlatformerGame.Game.prototype = {
     },
     create: function() {
 
+        console.log('Game create');
+        ws.setStage('Game', this);
+        ws.login('17888');  //传home
+
         //  A simple background for our game
         this.game.add.sprite(0, 0, 'background');
         //发牌
-        this.wsFactory().receive({act : 'dealCards', cards:['sjr','sjb','d2','h2','sA','cQ','hQ','h10','c9','d8','s6','h5','s5','c4','h4','d3','h3']});
+        this.wsFactoryGenerator.receive({act : 'fp', cards:['sjr','sjb','d2','h2','sA','cQ','hQ','h10','c9','d8','s6','h5','s5','c4','h4','d3','h3']});
 
-
-
-        //*/
+        /*
         var data = [{key:'h3',index:'3'},{key:'h1',index:'1'},{key:'h2',index:'2'}];
         console.log(data);
         var compair = function(propertyName){
@@ -111,7 +135,7 @@ PlatformerGame.Game.prototype = {
         }
         data.sort(compair('index'));
         console.log("compair:",data);
-      //  */
+        */
     },
 
     update : function(){
