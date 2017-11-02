@@ -115,7 +115,6 @@ PlatformerGame.Game.prototype = {
         }
     },
     create: function() {
-
         console.log('Game create');
         ws.setStage('Game', this);
         ws.login('17888');  //传home
@@ -123,7 +122,7 @@ PlatformerGame.Game.prototype = {
         //  A simple background for our game
         this.game.add.sprite(0, 0, 'background');
         //发牌
-        this.wsFactoryGenerator.receive({act : 'fp', cards:['sjr','sjb','d2','h2','sA','cQ','hQ','h10','c9','d8','s6','h5','s5','c4','h4','d3','h3']});
+        //this.wsFactoryGenerator.receive({act : 'fp', cards:['sjr','sjb','d2','h2','sA','cQ','hQ','h10','c9','d8','s6','h5','s5','c4','h4','d3','h3']});
 
         /*
         var data = [{key:'h3',index:'3'},{key:'h1',index:'1'},{key:'h2',index:'2'}];

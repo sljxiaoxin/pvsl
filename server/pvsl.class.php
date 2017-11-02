@@ -27,7 +27,7 @@
 						);
 				*/
 				private $arrHome = array();
-				private $map = array();
+				private $arrCards = array('s3','h3','c3','d3','s4','h4','c4','d4','s5','h5','c5','d5','s6','h6','c6','d6','s7','h7','c7','d7','s8','h8','c8','d8','s9','h9','c9','d9','s10','h10','c10','d10','sJ','hJ','cJ','dJ','sQ','hQ','cQ','dQ','sK','hK','cK','dK','sA','hA','cA','dA','s2','h2','c2','d2','sjb','sjr');
 
 
 				public function __construct() {
@@ -175,6 +175,25 @@
 
 				public function onFP($home){
 						$this->arrHome[$home]['currStep'] = 'FP';
+						$arrFpCards = $this->arrCards;
+						$arrCardsMap = array(array(),array(),array());
+						$arrCardsHide = array();
+						for($i=0;$i<3;$i++){
+								$randCards = array_rand($arrFpCards, 17);
+								for($j=0;$j<17;$j++){
+										$arrCardsMap[$i][]= $this->arrCards[$randCards[$j]];
+								}
+								$arrFpCards = array_diff($arrFpCards, $arrCardsMap[$i]);
+								$arrCardsMap[$i] = array_reverse($arrCardsMap[$i]);
+						}
+						$arrCardsHide = array_merge($arrFpCards,array());
+						print_r($arrCardsMap);
+						print_r($arrCardsHide);
+						//print_r($this->arrCards);
+						$arrMember = $this->arrHome[$home]['member'];
+						for($i=0;$i<3;$i++){
+								$this->sendClientMsg($arrMember[$i], array('act'=>'fp','cards'=>$arrCardsMap[$i], 'hideCards'=>$arrCardsHide));
+						}
 				}
 
 				public function onJDZ($home){

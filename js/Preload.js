@@ -25,13 +25,16 @@ PlatformerGame.Preload.prototype = {
     var self = this;
     console.log("Preload create func");
 
+    ///*
     ws.connect(function(status){
+      //  alert("ws connect ："+status);
         if(status == 'open'){
             console.log("ws.connect callback");
             //PlatformerGame.game.state.add('Game', PlatformerGame.Game);
             self.state.start('Game', true, false, colour, timeout);
         }
     });
+    //*/
     // armour, boots, mask, springBoots
     //this.state.start('Ending', true, false, false, false, false, false);
   }

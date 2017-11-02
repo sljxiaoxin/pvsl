@@ -7,11 +7,11 @@ function getDirection() {
     switch (window.orientation) {
         case 0:
         case 180:
-            Global.direction = '1'
+            Global.direction = '1';
             break;
         case -90:
         case 90:
-            Global.direction = '一'
+            Global.direction = '一';
             break;
     }
 }
