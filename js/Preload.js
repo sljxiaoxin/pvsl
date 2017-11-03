@@ -16,6 +16,8 @@ PlatformerGame.Preload.prototype = {
     this.game.load.image('background', 'assets/images/background.png');
     this.game.load.image('landlords', 'assets/images/landlords.png');
     this.game.load.image('farmer', 'assets/images/farmer.png');
+    this.game.load.image('timer', 'assets/images/timer.png');
+    this.game.load.image('button', 'assets/images/button.png');
 
 
   },

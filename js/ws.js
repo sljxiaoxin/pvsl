@@ -5,7 +5,7 @@ var ws = {
         Game : null
     },
     connect : function(cb){
-        this._ws = new WebSocket("ws://127.0.0.1:8000");
+        this._ws = new WebSocket("ws://10.190.19.140:8000");
         var self = this;
         this._ws.onopen = function() {
         		console.log("连接成功");
@@ -27,7 +27,7 @@ var ws = {
       	};
       	setInterval(function(){
       		self.send({act:'heartcheck'});
-      	}, 1000*20);
+      	}, 1000*60);
     },
     setStage : function(key,obj){
         this.stageInstance[key] = obj;
